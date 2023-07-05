@@ -1,5 +1,5 @@
 # rust_tracing
-My implementation of the Ray Tracing in One Weekend book in Rust
+My implementation of the [_Ray Tracing in One Weekend_](https://raytracing.github.io/books/RayTracingInOneWeekend.html) book in Rust
 
 ## Branches
 
