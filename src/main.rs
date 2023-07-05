@@ -1,8 +1,9 @@
+use std::num::NonZeroU32;
 use chrono::Utc;
 use winit::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
-    window::{WindowBuilder, Window},
+    window::{WindowBuilder}, dpi::LogicalSize,
 };
 
 mod math;
@@ -20,29 +21,12 @@ use crate::sphere::*;
 use crate::hittable_list::*;
 use crate::camera::*;
 
-fn main() -> std::io::Result<()> {
-
-    
-    let event_loop = EventLoop::new();
-    let window = WindowBuilder::new().build(&event_loop).unwrap();
-    event_loop.run(move |event, _, control_flow| {
-        *control_flow = ControlFlow::Wait;
-
-        match event {
-            Event::WindowEvent {
-                event: WindowEvent::CloseRequested,
-                window_id,
-            } if window_id == window.id() => *control_flow = ControlFlow::Exit,
-            _ => (),
-        }
-    });
-
-
+fn main() {
     // IMAGE
     let image_specs = ImageSpecs {
-        aspect_ratio: 16.0 / 9.0,
-        image_width: 640,
-        image_height: (640 as f64 / (16.0 / 9.0)) as u32,
+        aspect_ratio: 4.0 / 3.0,
+        image_width: 800,
+        image_height: 600 as u32,
         samples_per_pixel: 3,
         max_depth: 5
     };
@@ -68,5 +52,52 @@ fn main() -> std::io::Result<()> {
     let time = finish - start;
     println!("Done in {} seconds!", time.num_seconds());
 
-    return Ok(());
+    // WINDOW
+    let event_loop = EventLoop::new();
+    let window = WindowBuilder::new()
+        .with_title("rust_tracing")
+        .with_inner_size(LogicalSize::new(799, 599))
+        .build(&event_loop)
+        .unwrap();
+
+    let context = unsafe { softbuffer::Context::new(&window) }.unwrap();
+    let mut surface = unsafe { softbuffer::Surface::new(&context, &window) }.unwrap();
+
+    event_loop.run(move |event, _, control_flow| {
+        *control_flow = ControlFlow::Wait;
+
+        match event {
+            Event::RedrawRequested(window_id) if window_id == window.id() => {
+                let (width, height) = {
+                    let size = window.inner_size();
+                    (size.width, size.height)
+                };
+                surface
+                    .resize(
+                        NonZeroU32::new(width).unwrap(),
+                        NonZeroU32::new(height).unwrap(),
+                    )
+                    .unwrap();
+
+                let mut buffer = surface.buffer_mut().unwrap();
+                for index in 0..(width * height) {
+                    let y = index / width;
+                    let x = index % width;
+
+                    let r = img.get_pixel(x, y).0[0] as u32;
+                    let g = img.get_pixel(x, y).0[1] as u32;
+                    let b = img.get_pixel(x, y).0[2] as u32;
+
+                    buffer[index as usize] = b | (g << 8) | (r << 16);
+                }
+                buffer.present().unwrap();
+            }
+
+            Event::WindowEvent {
+                event: WindowEvent::CloseRequested,
+                window_id,
+            } if window_id == window.id() => *control_flow = ControlFlow::Exit,
+            _ => (),
+        }
+    });
 }
