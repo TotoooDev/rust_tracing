@@ -1,6 +1,10 @@
+use std::vec::Vec;
+
+use crate::sphere::*;
+use crate::math::vec3::*;
+use crate::material::*;
 use crate::hittable::Hittable;
 use crate::hittable::HitRecord;
-use std::vec::Vec;
 
 pub struct HittableList<Object> {
     objects: Vec<Object>
@@ -36,5 +40,49 @@ impl<Object: Hittable> HittableList<Object> {
         }
 
         return (hit_anything, hit_rec);
+    }
+
+    pub fn random_scene() -> HittableList<Sphere> {
+        let mut world = HittableList::new();
+    
+        let ground_material = Material::new(Color::new(0.5, 0.5, 0.5), MaterialType::LAMBERTIAN);
+        world.add(Sphere::new(Vec3::new(0.0, -1000.0, 0.0), 1000.0, ground_material));
+    
+        for a in -11..11 {
+            for b in -11..11 {
+                let choose_mat = rand::random::<f64>();
+                let center = Point3::new(a as f64 + 0.9 * rand::random::<f64>(), 0.2, b as f64 + 0.9 * rand::random::<f64>());
+    
+                if (center - Point3::new(4.0, 0.2, 0.0)).length() > 0.9 {
+                    if choose_mat < 0.8 {
+                        let sphere_material = Material::new(Color::random(), MaterialType::LAMBERTIAN);
+                        world.add(Sphere::new(center, 0.2, sphere_material));
+                    }
+                    else if choose_mat < 0.95 {
+                        let mut sphere_material = Material::new(Color::random(), MaterialType::METAL);
+                        sphere_material.fuzz = rand::random::<f64>();
+                        world.add(Sphere::new(center, 0.2, sphere_material));
+                    }
+                    else {
+                        let mut sphere_material = Material::new(Color::random(), MaterialType::DIELECTRIC);
+                        sphere_material.refraction_index = 1.5;
+                        world.add(Sphere::new(center, 0.2, sphere_material));
+                    }
+                }
+            }
+        }
+    
+        let mut material1 = Material::new(Color::new(1.0, 1.0, 1.0), MaterialType::DIELECTRIC);
+        material1.refraction_index = 1.5;
+        world.add(Sphere::new(Point3::new(0.0, 1.0, 0.0), -1.0, material1));
+    
+        let material2 = Material::new(Color::new(1.0, 1.0, 1.0), MaterialType::LAMBERTIAN);
+        world.add(Sphere::new(Point3::new(-4.0, 1.0, 0.0), 1.0, material2));
+        
+        let mut material3 = Material::new(Color::new(1.0, 1.0, 1.0), MaterialType::METAL);
+        material3.fuzz = 0.0;
+        world.add(Sphere::new(Point3::new(4.0, 1.0, 0.0), 1.0, material3));
+    
+        return world;
     }
 }
