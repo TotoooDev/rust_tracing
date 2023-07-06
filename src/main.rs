@@ -1,9 +1,8 @@
 use std::num::NonZeroU32;
-use chrono::Utc;
 use winit::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
-    window::{WindowBuilder}, dpi::LogicalSize,
+    window::WindowBuilder, dpi::LogicalSize,
 };
 
 mod math;
@@ -27,7 +26,7 @@ fn main() {
         aspect_ratio: 4.0 / 3.0,
         image_width: 800,
         image_height: 600 as u32,
-        samples_per_pixel: 3,
+        samples_per_pixel: 10,
         max_depth: 5
     };
     
@@ -44,13 +43,10 @@ fn main() {
     
     // RENDER
     let mut renderer = Renderer::new(image_specs, cam, world);
-    let start = Utc::now();
-    let img = renderer.render();
-    img.save("result.png").unwrap();
-
-    let finish = Utc::now();
-    let time = finish - start;
-    println!("Done in {} seconds!", time.num_seconds());
+    let mut img: image::RgbImage = image::ImageBuffer::new(800, 600);
+    // img = renderer.render();
+    // img.save("result.png").unwrap();
+    let mut scanline_index: u32 = image_specs.image_height - 1;
 
     // WINDOW
     let event_loop = EventLoop::new();
@@ -64,10 +60,21 @@ fn main() {
     let mut surface = unsafe { softbuffer::Surface::new(&context, &window) }.unwrap();
 
     event_loop.run(move |event, _, control_flow| {
-        *control_flow = ControlFlow::Wait;
+        control_flow.set_poll();
+        window.request_redraw();
 
         match event {
-            Event::RedrawRequested(window_id) if window_id == window.id() => {
+            Event::WindowEvent { event, .. } => match event {
+                WindowEvent::CloseRequested => control_flow.set_exit(),
+                _ => ()
+            },
+
+            Event::RedrawRequested(_) => {
+                renderer.render_scanline(&mut img, scanline_index);
+                if scanline_index > 0 {
+                    scanline_index -= 1;
+                }
+
                 let (width, height) = {
                     let size = window.inner_size();
                     (size.width, size.height)
@@ -81,23 +88,26 @@ fn main() {
 
                 let mut buffer = surface.buffer_mut().unwrap();
                 for index in 0..(width * height) {
-                    let y = index / width;
+                    let y = image_specs.image_height - 1 - index / width;
                     let x = index % width;
 
-                    let r = img.get_pixel(x, y).0[0] as u32;
-                    let g = img.get_pixel(x, y).0[1] as u32;
-                    let b = img.get_pixel(x, y).0[2] as u32;
+                    let pixel = img.get_pixel_mut(x, y);
+                    let image::Rgb(data) = *pixel;
+
+                    let r = data[0] as u32;
+                    let g = data[1] as u32;
+                    let b = data[2] as u32;
+
+                    // let r = 255;
+                    // let g = 0;
+                    // let b = 255;
 
                     buffer[index as usize] = b | (g << 8) | (r << 16);
                 }
                 buffer.present().unwrap();
-            }
+            },
 
-            Event::WindowEvent {
-                event: WindowEvent::CloseRequested,
-                window_id,
-            } if window_id == window.id() => *control_flow = ControlFlow::Exit,
-            _ => (),
+            _ => ()
         }
     });
 }

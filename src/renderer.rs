@@ -8,6 +8,7 @@ use crate::math;
 use crate::math::vec3::*;
 use crate::math::ray::*;
 
+#[derive(Clone, Copy)]
 pub struct ImageSpecs {
     pub aspect_ratio: f64,
     pub image_width: u32,
@@ -50,10 +51,28 @@ impl Renderer {
             }
         }
     
-        img = imageops::rotate180(&img);
-        img = imageops::flip_horizontal(&img);
+        Renderer::do_img_ops(&mut img);
 
         return img;
+    }
+
+    pub fn render_scanline(&mut self, img: &mut RgbImage, index: u32) {
+        for i in 0..self.image_specs.image_width {
+            let mut color = Color::new(0.0, 0.0, 0.0);
+            for _k in 0..self.image_specs.samples_per_pixel {
+                let u = (i as f64 + random::<f64>()) / (self.image_specs.image_width - 1) as f64;
+                let v = (index as f64 + random::<f64>()) / (self.image_specs.image_height - 1) as f64;
+                let ray = self.cam.get_ray(u, v);
+                color += Renderer::ray_color(ray, &mut self.world, self.image_specs.max_depth);
+
+            }
+            Renderer::put_pixel_float(img, color, i, index, self.image_specs.samples_per_pixel);
+        }
+    }
+
+    pub fn do_img_ops(img: &mut RgbImage) {
+        *img = imageops::rotate180(img);
+        *img = imageops::flip_horizontal(img);
     }
 
     fn put_pixel_float(img: &mut RgbImage, color: Color, x: u32, y: u32, samples_per_pixel: u32) {
@@ -70,7 +89,7 @@ impl Renderer {
             (255.0 * math::clamp(r, 0.0, 1.0)) as u8, 
             (255.0 * math::clamp(g, 0.0, 1.0)) as u8, 
             (255.0 * math::clamp(b, 0.0, 1.0)) as u8]
-        ))
+        ));
     }
 
     fn ray_color(r: Ray, world: &mut HittableList<Sphere>, depth: u32) -> Color {
