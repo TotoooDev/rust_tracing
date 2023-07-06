@@ -1,5 +1,5 @@
 use std::num::NonZeroU32;
-use std::thread;
+use material::Material;
 use winit::{
     event::{Event, WindowEvent},
     event_loop::EventLoop,
@@ -16,6 +16,8 @@ mod renderer;
 use crate::math::vec3::*;
 use crate::renderer::ImageSpecs;
 use crate::renderer::Renderer;
+use crate::hittable::sphere::*;
+use crate::hittable::triangle::*;
 use crate::hittable_list::*;
 use crate::camera::*;
 
@@ -25,20 +27,21 @@ fn main() {
         aspect_ratio: 4.0 / 3.0,
         image_width: 800,
         image_height: 600 as u32,
-        samples_per_pixel: 10,
-        max_depth: 5
+        samples_per_pixel: 5,
+        max_depth: 2
     };
     
     // CAMERA
     let cam = Camera::new(
-        Point3::new(13.0, 2.0, 3.0), 
+        Point3::new(0.0, 0.0, 2.0), 
         Vec3::new(0.0, 0.0, 0.0), 
         Vec3::new(0.0, 1.0, 0.0), 
         20.0, 
         image_specs.aspect_ratio);
 
     // WORLD
-    let world = HittableList::<Sphere>::random_scene();
+    let mut world = HittableList::<Triangle>::new();
+    world.add(Triangle::new(Point3::new(0.0, 0.5, -1.0), Point3::new(-0.5, -0.5, -1.0), Point3::new(0.5, -0.5, -1.0), Material::new(Color::new(0.0, 0.0, 0.0), material::MaterialType::LAMBERTIAN)));
     
     // RENDER
     let mut renderer = Renderer::new(image_specs, cam, world);
