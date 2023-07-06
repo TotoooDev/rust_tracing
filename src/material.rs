@@ -29,7 +29,7 @@ impl Material {
         }
     }
 
-    fn scatter_lambertian(self, r_in: Ray, rec: HitRecord) -> (bool, Color, Ray) {
+    fn scatter_lambertian(self, _r_in: Ray, rec: HitRecord) -> (bool, Color, Ray) {
         let mut scatter_direction = rec.normal + Vec3::random_unit();
 
         if scatter_direction.near_zero() {

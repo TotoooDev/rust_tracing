@@ -1,7 +1,7 @@
 use std::num::NonZeroU32;
 use winit::{
     event::{Event, WindowEvent},
-    event_loop::{ControlFlow, EventLoop},
+    event_loop::EventLoop,
     window::WindowBuilder, dpi::LogicalSize,
 };
 
@@ -44,8 +44,6 @@ fn main() {
     // RENDER
     let mut renderer = Renderer::new(image_specs, cam, world);
     let mut img: image::RgbImage = image::ImageBuffer::new(800, 600);
-    // img = renderer.render();
-    // img.save("result.png").unwrap();
     let mut scanline_index: u32 = image_specs.image_height - 1;
 
     // WINDOW

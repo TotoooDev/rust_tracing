@@ -1,4 +1,4 @@
-use image::{ImageBuffer, RgbImage, imageops};
+use image::{ImageBuffer, RgbImage};
 use rand::random;
 
 use crate::camera::*;
@@ -50,8 +50,6 @@ impl Renderer {
                 Renderer::put_pixel_float(&mut img, color, i, j, self.image_specs.samples_per_pixel);
             }
         }
-    
-        Renderer::do_img_ops(&mut img);
 
         return img;
     }
@@ -68,11 +66,6 @@ impl Renderer {
             }
             Renderer::put_pixel_float(img, color, i, index, self.image_specs.samples_per_pixel);
         }
-    }
-
-    pub fn do_img_ops(img: &mut RgbImage) {
-        *img = imageops::rotate180(img);
-        *img = imageops::flip_horizontal(img);
     }
 
     fn put_pixel_float(img: &mut RgbImage, color: Color, x: u32, y: u32, samples_per_pixel: u32) {
