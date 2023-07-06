@@ -96,10 +96,6 @@ fn main() {
                     let g = data[1] as u32;
                     let b = data[2] as u32;
 
-                    // let r = 255;
-                    // let g = 0;
-                    // let b = 255;
-
                     buffer[index as usize] = b | (g << 8) | (r << 16);
                 }
                 buffer.present().unwrap();
