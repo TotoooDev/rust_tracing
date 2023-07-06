@@ -6,6 +6,7 @@ use winit::{
     window::WindowBuilder, dpi::LogicalSize,
 };
 
+mod utils;
 mod math;
 mod hittable;
 mod hittable_list;
@@ -27,22 +28,22 @@ fn main() {
         aspect_ratio: 4.0 / 3.0,
         image_width: 800,
         image_height: 600 as u32,
-        samples_per_pixel: 5,
+        samples_per_pixel: 1,
         max_depth: 2
     };
     
     // CAMERA
     let cam = Camera::new(
-        Point3::new(0.0, 0.0, 2.0), 
-        Vec3::new(0.0, 0.0, 0.0), 
+        Point3::new(0.0, 0.0, 7.0), 
+        Vec3::new(0.0, 0.0, -1.0), 
         Vec3::new(0.0, 1.0, 0.0), 
         20.0, 
         image_specs.aspect_ratio);
-
+        
     // WORLD
-    let mut world = HittableList::<Triangle>::new();
-    world.add(Triangle::new(Point3::new(0.0, 0.5, -1.0), Point3::new(-0.5, -0.5, -1.0), Point3::new(0.5, -0.5, -1.0), Material::new(Color::new(0.0, 0.0, 0.0), material::MaterialType::LAMBERTIAN)));
-    
+    let mut world = utils::triangles_from_obj(&"model.obj".to_string());
+    // world.add(Triangle::new(Point3::new(0.0, 0.5, -1.0), Point3::new(-0.5, -0.5, -1.0), Point3::new(0.5, -0.5, -1.0), Material::new(Color::random(), material::MaterialType::LAMBERTIAN)));
+
     // RENDER
     let mut renderer = Renderer::new(image_specs, cam, world);
     let mut img: image::RgbImage = image::ImageBuffer::new(800, 600);

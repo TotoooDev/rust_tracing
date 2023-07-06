@@ -20,6 +20,10 @@ impl<Object> HittableList<Object> {
         self.objects.push(object);
     }
 
+    pub fn add_vec(&mut self, vec: &mut Vec<Object>) {
+        self.objects.append(vec);
+    }
+
     pub fn clear(&mut self) {
         self.objects.clear();
     }
