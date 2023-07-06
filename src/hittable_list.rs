@@ -2,6 +2,7 @@ use std::vec::Vec;
 
 use crate::sphere::*;
 use crate::math::vec3::*;
+use crate::math::ray::*;
 use crate::material::*;
 use crate::hittable::Hittable;
 use crate::hittable::HitRecord;
@@ -25,8 +26,8 @@ impl<Object> HittableList<Object> {
 }
 
 impl<Object: Hittable> HittableList<Object> {
-    pub fn hit(&self, r: crate::math::ray::Ray, t_min: f64, t_max: f64) -> (bool, HitRecord) {
-        let mut hit_rec = HitRecord::new();
+    pub fn hit(&self, r: Ray, t_min: f64, t_max: f64) -> (bool, HitRecord) {
+        let (_, mut hit_rec) = self.objects[0].hit(r, t_min, t_max);
         let mut hit_anything = false;
         let mut closest_so_far = t_max;
 

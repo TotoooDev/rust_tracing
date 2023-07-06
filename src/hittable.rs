@@ -4,22 +4,23 @@ use crate::math::ray::*;
 use crate::material::*;
 
 #[derive(Clone, Copy)]
-pub struct HitRecord {
+pub struct HitRecord<'a> {
     pub p: Point3,
     pub normal: Vec3,
     pub t: f64,
-    pub mat: Material,
+    pub mat: &'a Material,
     front_face: bool
 }
 
-impl HitRecord {
-    pub fn new() -> HitRecord {
+impl HitRecord<'_> {
+    pub fn new(mat: &Material) -> HitRecord {
         return HitRecord {
             p: Vec3 {x: 0.0, y: 0.0, z: 0.0},
             normal: Vec3 {x: 0.0, y: 0.0, z: 0.0},
             t: 0.0,
-            mat: Material::new(Color::new(0.0, 0.0, 0.0), MaterialType::METAL),
-            front_face: false };
+            mat,
+            front_face: false 
+        };
     }
 
     pub fn set_face_normal(&mut self, r: Ray, outward_normal: Vec3) {

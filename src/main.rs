@@ -1,4 +1,5 @@
 use std::num::NonZeroU32;
+use std::thread;
 use winit::{
     event::{Event, WindowEvent},
     event_loop::EventLoop,
@@ -26,8 +27,8 @@ fn main() {
         aspect_ratio: 4.0 / 3.0,
         image_width: 800,
         image_height: 600 as u32,
-        samples_per_pixel: 10,
-        max_depth: 5
+        samples_per_pixel: 5,
+        max_depth: 1
     };
     
     // CAMERA
@@ -57,6 +58,7 @@ fn main() {
     let context = unsafe { softbuffer::Context::new(&window) }.unwrap();
     let mut surface = unsafe { softbuffer::Surface::new(&context, &window) }.unwrap();
 
+    // MAIN LOOP
     event_loop.run(move |event, _, control_flow| {
         control_flow.set_poll();
         window.request_redraw();
