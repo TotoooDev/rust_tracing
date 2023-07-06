@@ -27,8 +27,8 @@ fn main() {
         aspect_ratio: 4.0 / 3.0,
         image_width: 800,
         image_height: 600 as u32,
-        samples_per_pixel: 5,
-        max_depth: 1
+        samples_per_pixel: 10,
+        max_depth: 5
     };
     
     // CAMERA
@@ -70,8 +70,8 @@ fn main() {
             },
 
             Event::RedrawRequested(_) => {
-                renderer.render_scanline(&mut img, scanline_index);
                 if scanline_index > 0 {
+                    renderer.render_scanline(&mut img, scanline_index);
                     scanline_index -= 1;
                 }
 

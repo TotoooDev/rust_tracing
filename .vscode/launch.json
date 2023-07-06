@@ -7,6 +7,25 @@
         {
             "type": "lldb",
             "request": "launch",
+            "name": "Launch release executable 'rust_tracing'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=rust_tracing",
+                    "--package=rust_tracing",
+                    "--release"
+                ],
+                "filter": {
+                    "name": "rust_tracing",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}/target/release"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
             "name": "Debug executable 'rust_tracing'",
             "cargo": {
                 "args": [

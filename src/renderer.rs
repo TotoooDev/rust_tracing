@@ -37,18 +37,7 @@ impl Renderer {
 
         for j in 0..self.image_specs.image_height {
             println!("{} scanlines remaining...", self.image_specs.image_height - j);
-            
-            for i in 0..self.image_specs.image_width {
-                let mut color = Color::new(0.0, 0.0, 0.0);
-                for _k in 0..self.image_specs.samples_per_pixel {
-                    let u = (i as f64 + random::<f64>()) / (self.image_specs.image_width - 1) as f64;
-                    let v = (j as f64 + random::<f64>()) / (self.image_specs.image_height - 1) as f64;
-                    let ray = self.cam.get_ray(u, v);
-                    color += Renderer::ray_color(ray, &mut self.world, self.image_specs.max_depth);
-    
-                }
-                Renderer::put_pixel_float(&mut img, color, i, j, self.image_specs.samples_per_pixel);
-            }
+            self.render_scanline(&mut img, j);
         }
 
         return img;
