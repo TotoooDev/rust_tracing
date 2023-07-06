@@ -7,7 +7,6 @@ use winit::{
 };
 
 mod math;
-mod sphere;
 mod hittable;
 mod hittable_list;
 mod camera;
@@ -17,7 +16,6 @@ mod renderer;
 use crate::math::vec3::*;
 use crate::renderer::ImageSpecs;
 use crate::renderer::Renderer;
-use crate::sphere::*;
 use crate::hittable_list::*;
 use crate::camera::*;
 

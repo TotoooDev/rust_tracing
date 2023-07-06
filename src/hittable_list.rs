@@ -1,6 +1,6 @@
 use std::vec::Vec;
 
-use crate::sphere::*;
+use crate::hittable::sphere::*;
 use crate::math::vec3::*;
 use crate::math::ray::*;
 use crate::material::*;

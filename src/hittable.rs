@@ -3,6 +3,9 @@ use crate::math::vec3::*;
 use crate::math::ray::*;
 use crate::material::*;
 
+pub mod sphere;
+pub mod triangle;
+
 #[derive(Clone, Copy)]
 pub struct HitRecord<'a> {
     pub p: Point3,
