@@ -75,6 +75,10 @@ impl Hittable for Triangle {
         }
 
         // Yay
-        return (true, HitRecord::new(&self.mat));
+        let mut hit_record = HitRecord::new(&self.mat);
+        hit_record.t = t;
+        hit_record.p = p;
+        hit_record.normal = n;
+        return (true, hit_record);
     }
 }

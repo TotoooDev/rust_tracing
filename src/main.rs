@@ -28,20 +28,21 @@ fn main() {
         aspect_ratio: 4.0 / 3.0,
         image_width: 800,
         image_height: 600 as u32,
-        samples_per_pixel: 1,
-        max_depth: 2
+        samples_per_pixel: 10,
+        max_depth: 5
     };
     
     // CAMERA
     let cam = Camera::new(
-        Point3::new(0.0, 0.0, 7.0), 
-        Vec3::new(0.0, 0.0, -1.0), 
+        Point3::new(0.0, 0.0, 100.0), 
+        Vec3::new(0.0, 0.0, 0.0), 
         Vec3::new(0.0, 1.0, 0.0), 
-        20.0, 
+        80.0, 
         image_specs.aspect_ratio);
         
     // WORLD
-    let mut world = utils::triangles_from_obj(&"model.obj".to_string());
+    let mut world = HittableList::<Triangle>::new();
+    world.add_vec(&mut utils::triangles_from_obj("love.obj".to_string()));
     // world.add(Triangle::new(Point3::new(0.0, 0.5, -1.0), Point3::new(-0.5, -0.5, -1.0), Point3::new(0.5, -0.5, -1.0), Material::new(Color::random(), material::MaterialType::LAMBERTIAN)));
 
     // RENDER
