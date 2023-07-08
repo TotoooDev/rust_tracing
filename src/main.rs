@@ -1,10 +1,14 @@
 use std::num::NonZeroU32;
+use hittable::Hittable;
+use image::imageops;
 use material::Material;
 use winit::{
-    event::{Event, WindowEvent},
+    event::{Event, WindowEvent, ElementState},
     event_loop::EventLoop,
-    window::WindowBuilder, dpi::LogicalSize,
+    window::WindowBuilder, dpi::LogicalSize, platform::modifier_supplement::KeyEventExtModifierSupplement,
+    keyboard::{Key, ModifiersState},
 };
+
 
 mod utils;
 mod math;
@@ -18,7 +22,7 @@ use crate::math::vec3::*;
 use crate::renderer::ImageSpecs;
 use crate::renderer::Renderer;
 use crate::hittable::sphere::*;
-use crate::hittable::triangle::*;
+use crate::hittable::model::*;
 use crate::hittable_list::*;
 use crate::camera::*;
 
@@ -34,16 +38,24 @@ fn main() {
     
     // CAMERA
     let cam = Camera::new(
-        Point3::new(0.0, 0.0, 100.0), 
-        Vec3::new(0.0, 0.0, 0.0), 
+        Point3::new(0.0, 10.0, 100.0), 
+        Vec3::new(0.0, 10.0, 0.0), 
         Vec3::new(0.0, 1.0, 0.0), 
         80.0, 
         image_specs.aspect_ratio);
         
     // WORLD
-    let mut world = HittableList::<Triangle>::new();
-    world.add_vec(&mut utils::triangles_from_obj("love.obj".to_string()));
-    // world.add(Triangle::new(Point3::new(0.0, 0.5, -1.0), Point3::new(-0.5, -0.5, -1.0), Point3::new(0.5, -0.5, -1.0), Material::new(Color::random(), material::MaterialType::LAMBERTIAN)));
+    let mut world = HittableList::new();
+
+    let mut model_mat = Material::new(Color::new(0.84, 0.07, 0.08), material::MaterialType::DIELECTRIC);
+    model_mat.refraction_index = 1.5;
+
+    let mut big_sphere_mat = Material::new(Color::new(0.56, 0.21, 0.8), material::MaterialType::METAL);
+    big_sphere_mat.fuzz = 0.05;
+
+    world.add(Box::new(Model::new("love.obj".to_string(), Vec3::new(0.0, 0.0, 0.0), model_mat)));
+    world.add(Box::new(Sphere::new(Point3::new(0.0, -1000.0, 0.0), 1000.0, big_sphere_mat)));
+    world.add(Box::new(Sphere::new(Point3::new(40.0, 8.0, 50.0), 10.0, Material::new(Color::new(0.21, 0.8, 0.4), material::MaterialType::LAMBERTIAN))));
 
     // RENDER
     let mut renderer = Renderer::new(image_specs, cam, world);
@@ -69,6 +81,19 @@ fn main() {
         match event {
             Event::WindowEvent { event, .. } => match event {
                 WindowEvent::CloseRequested => control_flow.set_exit(),
+
+                WindowEvent::KeyboardInput { event, .. } => {
+                    if event.state == ElementState::Pressed {
+                        match event.key_without_modifiers().as_ref() {
+                            Key::Character("s") => {
+                                let img_save = imageops::flip_horizontal(&imageops::rotate180(&img));
+                                img_save.save("result.png").unwrap();
+                            },
+                            _ => ()
+                        }
+                    }
+                },
+
                 _ => ()
             },
 

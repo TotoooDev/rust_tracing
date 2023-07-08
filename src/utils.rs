@@ -20,11 +20,13 @@ pub fn triangles_from_obj(path: String) -> Vec<Triangle> {
             let v1 = Point3::new(mesh.positions[3 * idx1] as f64, mesh.positions[3 * idx1 + 1] as f64, mesh.positions[3 * idx1 + 2] as f64);
             let v2 = Point3::new(mesh.positions[3 * idx2] as f64, mesh.positions[3 * idx2 + 1] as f64, mesh.positions[3 * idx2 + 2] as f64);
 
+            let mut mat = Material::new(Color::new(1.0, 0.0, 0.0), MaterialType::DIELECTRIC);
+            mat.refraction_index = 1.5;
             let triangle = Triangle::new(
                 v0,
                 v1,
                 v2,
-                Material::new(Color::new(1.0, 0.0, 0.0), MaterialType::LAMBERTIAN)
+                mat
             );
 
             triangles.push(triangle);

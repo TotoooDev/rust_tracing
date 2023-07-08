@@ -3,8 +3,6 @@ use rand::random;
 
 use crate::camera::*;
 use crate::hittable_list::*;
-use crate::hittable::sphere::*;
-use crate::hittable::triangle::*;
 use crate::math;
 use crate::math::vec3::*;
 use crate::math::ray::*;
@@ -21,11 +19,11 @@ pub struct ImageSpecs {
 pub struct Renderer {
     image_specs: ImageSpecs,
     cam: Camera,
-    world: HittableList<Triangle>
+    world: HittableList
 }
 
 impl Renderer {
-    pub fn new(image_specs: ImageSpecs, cam: Camera, world: HittableList<Triangle>) -> Renderer {
+    pub fn new(image_specs: ImageSpecs, cam: Camera, world: HittableList) -> Renderer {
         return Renderer {
             image_specs,
             cam,
@@ -75,7 +73,7 @@ impl Renderer {
         ));
     }
 
-    fn ray_color(r: Ray, world: &mut HittableList<Triangle>, depth: u32) -> Color {
+    fn ray_color(r: Ray, world: &mut HittableList, depth: u32) -> Color {
         if depth <= 0 {
             return Color::new(0.0, 0.0, 0.0);
         }

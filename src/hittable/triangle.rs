@@ -5,7 +5,7 @@ pub struct Triangle {
     v0: Point3,
     v1: Point3,
     v2: Point3,
-    mat: Material
+    pub mat: Material
 }
 
 impl Triangle {
@@ -28,8 +28,7 @@ impl Hittable for Triangle {
         let v0v1 = self.v1 - self.v0;
         let v0v2 = self.v2 - self.v0;
         // No need to normalize
-        let n = cross(v0v1, v0v2); // Unsure of the operation here
-        let area = n.length();
+        let n = cross(v0v1, v0v2).normalize();
 
         // Finding P (the point of intersection)
         // Check if the ray and plane are parallel

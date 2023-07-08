@@ -5,6 +5,7 @@ use crate::material::*;
 
 pub mod sphere;
 pub mod triangle;
+pub mod model;
 
 #[derive(Clone, Copy)]
 pub struct HitRecord<'a> {
