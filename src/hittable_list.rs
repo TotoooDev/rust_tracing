@@ -20,10 +20,6 @@ impl HittableList {
         self.objects.push(object);
     }
 
-    pub fn add_vec(&mut self, vec: &mut Vec<Box<dyn Hittable>>) {
-        self.objects.append(vec);
-    }
-
     pub fn clear(&mut self) {
         self.objects.clear();
     }

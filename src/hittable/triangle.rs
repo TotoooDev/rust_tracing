@@ -20,7 +20,8 @@ impl Triangle {
 }
 
 impl Hittable for Triangle {
-    fn hit(&self, r: Ray, t_min: f64, t_max: f64) -> (bool, HitRecord) {
+    // TODO: Use t_min and t_max
+    fn hit(&self, r: Ray, _t_min: f64, _t_max: f64) -> (bool, HitRecord) {
         // From https://www.scratchapixel.com/lessons/3d-basic-rendering/ray-tracing-rendering-a-triangle/ray-triangle-intersection-geometric-solution.html
         // I was too lazy to do the maths by myself
 

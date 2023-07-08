@@ -1,16 +1,14 @@
 use std::num::NonZeroU32;
-use hittable::Hittable;
 use image::imageops;
 use material::Material;
 use winit::{
     event::{Event, WindowEvent, ElementState},
     event_loop::EventLoop,
     window::WindowBuilder, dpi::LogicalSize, platform::modifier_supplement::KeyEventExtModifierSupplement,
-    keyboard::{Key, ModifiersState},
+    keyboard::Key,
 };
 
 
-mod utils;
 mod math;
 mod hittable;
 mod hittable_list;
@@ -29,21 +27,22 @@ use crate::camera::*;
 fn main() {
     // IMAGE
     let image_specs = ImageSpecs {
-        aspect_ratio: 4.0 / 3.0,
-        image_width: 800,
-        image_height: 600 as u32,
-        samples_per_pixel: 10,
-        max_depth: 5
+        aspect_ratio: 16.0 / 9.0,
+        image_width: 1280,
+        image_height: 720,
+        samples_per_pixel: 50,
+        max_depth: 20
     };
     
     // CAMERA
     let cam = Camera::new(
-        Point3::new(0.0, 10.0, 100.0), 
+        Point3::new(0.0, 20.0, 130.0), 
         Vec3::new(0.0, 10.0, 0.0), 
         Vec3::new(0.0, 1.0, 0.0), 
-        80.0, 
-        image_specs.aspect_ratio);
-        
+        60.0, 
+        image_specs.aspect_ratio
+    );
+
     // WORLD
     let mut world = HittableList::new();
 
@@ -51,22 +50,27 @@ fn main() {
     model_mat.refraction_index = 1.5;
 
     let mut big_sphere_mat = Material::new(Color::new(0.56, 0.21, 0.8), material::MaterialType::METAL);
-    big_sphere_mat.fuzz = 0.05;
+    big_sphere_mat.fuzz = 0.03;
+
+    let mut smol_sphere_mat = Material::new(Color::new(0.2, 0.07, 0.28), material::MaterialType::METAL);
+    smol_sphere_mat.fuzz = 0.0;
 
     world.add(Box::new(Model::new("love.obj".to_string(), Vec3::new(0.0, 0.0, 0.0), model_mat)));
     world.add(Box::new(Sphere::new(Point3::new(0.0, -1000.0, 0.0), 1000.0, big_sphere_mat)));
-    world.add(Box::new(Sphere::new(Point3::new(40.0, 8.0, 50.0), 10.0, Material::new(Color::new(0.21, 0.8, 0.4), material::MaterialType::LAMBERTIAN))));
+    world.add(Box::new(Sphere::new(Point3::new(30.0, 8.0, 60.0), 10.0, Material::new(Color::new(0.21, 0.8, 0.4), material::MaterialType::LAMBERTIAN))));
+    world.add(Box::new(Sphere::new(Point3::new(-80.0, 40.0, -55.0), 40.0, smol_sphere_mat)));
 
     // RENDER
     let mut renderer = Renderer::new(image_specs, cam, world);
-    let mut img: image::RgbImage = image::ImageBuffer::new(800, 600);
+    let mut img: image::RgbImage = image::ImageBuffer::new(image_specs.image_width, image_specs.image_height);
     let mut scanline_index: u32 = image_specs.image_height - 1;
 
     // WINDOW
     let event_loop = EventLoop::new();
     let window = WindowBuilder::new()
         .with_title("rust_tracing")
-        .with_inner_size(LogicalSize::new(799, 599))
+        .with_inner_size(LogicalSize::new(image_specs.image_width - 1, image_specs.image_height - 1))
+        .with_resizable(false)
         .build(&event_loop)
         .unwrap();
 

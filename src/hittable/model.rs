@@ -10,12 +10,11 @@ pub struct Model {
 
 impl Model {
     pub fn new(path: String, pos: Vec3, mat: Material) -> Model {
-        let (models, materials_unsafe) = tobj::load_obj(path, &tobj::LoadOptions::default()).unwrap();
-        let materials = materials_unsafe.unwrap();
+        let (models, _materials_unsafe) = tobj::load_obj(path, &tobj::LoadOptions::default()).unwrap();
 
         let mut triangles = Vec::<Triangle>::new();
 
-        for (i, m) in models.iter().enumerate() {
+        for (_i, m) in models.iter().enumerate() {
             let mesh = &m.mesh;
             for index in 0..mesh.indices.len() / 3 {
                 let idx0 = mesh.indices[3 * index] as usize;
@@ -45,7 +44,6 @@ impl Hittable for Model {
     fn hit(&self, r: Ray, t_min: f64, t_max: f64) -> (bool, HitRecord) {
         // Registered hit record
         let (mut hit, mut hit_record): (bool, HitRecord) = (false, HitRecord::new(&self.triangles[0].mat));
-        hit = false;
         hit_record.t = f64::INFINITY;
 
         for triangle in &self.triangles {
