@@ -2,6 +2,7 @@ use crate::math;
 use crate::math::vec3::*;
 use crate::math::ray::*;
 use crate::material::*;
+use crate::aabb::*;
 
 pub mod sphere;
 pub mod triangle;
@@ -43,4 +44,5 @@ impl HitRecord<'_> {
 
 pub trait Hittable {
     fn hit(&self, r: Ray, t_min: f64, t_max: f64) -> (bool, HitRecord);
+    fn bounding_box(&self) -> (bool, AABB);
 }

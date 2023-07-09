@@ -4,8 +4,8 @@ use crate::hittable::sphere::*;
 use crate::math::vec3::*;
 use crate::math::ray::*;
 use crate::material::*;
-use crate::hittable::Hittable;
-use crate::hittable::HitRecord;
+use crate::hittable::*;
+use crate::aabb::*;
 
 pub struct HittableList {
     objects: Vec<Box<dyn Hittable>>
@@ -16,29 +16,16 @@ impl HittableList {
         return HittableList { objects: Vec::new() };
     }
 
+    pub fn objects(&self) -> Vec<Box<dyn Hittable>> {
+        return self.objects;
+    }
+
     pub fn add(&mut self, object: Box<dyn Hittable>) {
         self.objects.push(object);
     }
 
     pub fn clear(&mut self) {
         self.objects.clear();
-    }
-
-    pub fn hit(&self, r: Ray, t_min: f64, t_max: f64) -> (bool, HitRecord) {
-        let (_, mut hit_rec) = self.objects[0].hit(r, t_min, t_max);
-        let mut hit_anything = false;
-        let mut closest_so_far = t_max;
-
-        for object in self.objects.iter() {
-            let (hit, rec) = object.hit(r, t_min, closest_so_far);
-            if hit {
-                hit_anything = true;
-                closest_so_far = rec.t;
-                hit_rec = rec;
-            }
-        }
-
-        return (hit_anything, hit_rec);
     }
 
     pub fn random_scene() -> HittableList {
@@ -83,5 +70,52 @@ impl HittableList {
         world.add(Box::new(Sphere::new(Point3::new(4.0, 1.0, 0.0), 1.0, material3)));
     
         return world;
+    }
+}
+
+impl Hittable for HittableList {
+    fn hit(&self, r: Ray, t_min: f64, t_max: f64) -> (bool, HitRecord) {
+        let (_, mut hit_rec) = self.objects[0].hit(r, t_min, t_max);
+        let mut hit_anything = false;
+        let mut closest_so_far = t_max;
+
+        for object in self.objects {
+            let (hit, rec) = object.hit(r, t_min, closest_so_far);
+            if hit {
+                hit_anything = true;
+                closest_so_far = rec.t;
+                hit_rec = rec;
+            }
+        }
+
+        return (hit_anything, hit_rec);
+    }
+
+    fn bounding_box(&self) -> (bool, AABB) {
+        if self.objects.is_empty() {
+            return (false, AABB::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0)));
+        }
+
+        let mut output_box: AABB;
+
+        let mut temp_box: AABB;
+        let mut first_box = true;
+
+        for object in self.objects {
+            let (hit, aabb) = object.bounding_box();
+            if !hit {
+                return (hit, aabb);
+            }
+
+            if first_box {
+                output_box = temp_box
+            }
+            else {
+                output_box = surrounding_box(output_box, temp_box);
+                first_box = false;
+            }
+        }
+
+        return (true, output_box);
     }
 }

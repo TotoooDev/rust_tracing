@@ -15,6 +15,8 @@ mod hittable_list;
 mod camera;
 mod material;
 mod renderer;
+mod aabb;
+mod bvh;
 
 use crate::math::vec3::*;
 use crate::renderer::ImageSpecs;
@@ -27,11 +29,11 @@ use crate::camera::*;
 fn main() {
     // IMAGE
     let image_specs = ImageSpecs {
-        aspect_ratio: 16.0 / 9.0,
-        image_width: 1280,
-        image_height: 720,
-        samples_per_pixel: 50,
-        max_depth: 20
+        aspect_ratio: 4.0 / 3.0,
+        image_width: 800,
+        image_height: 600,
+        samples_per_pixel: 1,
+        max_depth: 3
     };
     
     // CAMERA

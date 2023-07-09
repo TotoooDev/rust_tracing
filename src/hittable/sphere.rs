@@ -45,4 +45,14 @@ impl Hittable for Sphere {
 
         return (true, rec);
     }
+
+    fn bounding_box(&self) -> (bool, AABB) {
+        return (
+            true,
+            AABB::new(
+                self.center - Vec3::new(self.radius, self.radius, self.radius),
+                self.center + Vec3::new(self.radius, self.radius, self.radius)
+            )
+        );
+    }
 }
