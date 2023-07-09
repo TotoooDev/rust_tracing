@@ -2,6 +2,10 @@ use std::ops;
 use rand::Rng;
 use rand::random;
 
+pub enum Axis {
+    X, Y, Z
+}
+
 #[derive(Clone, Copy)]
 pub struct Vec3 {
     pub x: f64,
