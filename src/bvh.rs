@@ -41,7 +41,7 @@ impl BVH {
 
         let object_span = end - start;
         if object_span == 1 {
-            left = Some(objects[start]);
+            left = Some(objects[start]); // why
             right = Some(objects[start]);
         }
         else if object_span == 2 {
