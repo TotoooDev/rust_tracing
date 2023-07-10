@@ -63,4 +63,8 @@ impl Hittable for Model {
 
         return (hit, hit_record);
     }
+
+    fn bounding_box(&self) -> (bool, AABB) {
+        return (false, AABB::new(Point3::new(0.0, 0.0, 0.0), Point3::new(0.0, 0.0, 0.0)));
+    }
 }

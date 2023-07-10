@@ -3,6 +3,7 @@ use rand::random;
 
 use crate::camera::*;
 use crate::hittable_list::*;
+use crate::hittable::*;
 use crate::math;
 use crate::math::vec3::*;
 use crate::math::ray::*;

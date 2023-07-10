@@ -81,4 +81,8 @@ impl Hittable for Triangle {
         hit_record.normal = n;
         return (true, hit_record);
     }
+
+    fn bounding_box(&self) -> (bool, AABB) {
+        return (false, AABB::new(Point3::new(0.0, 0.0, 0.0), Point3::new(0.0, 0.0, 0.0)));
+    }
 }

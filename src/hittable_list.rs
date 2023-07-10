@@ -8,16 +8,12 @@ use crate::hittable::*;
 use crate::aabb::*;
 
 pub struct HittableList {
-    objects: Vec<Box<dyn Hittable>>
+    pub objects: Vec<Box<dyn Hittable>>
 }
 
 impl HittableList {
     pub fn new() -> HittableList {
         return HittableList { objects: Vec::new() };
-    }
-
-    pub fn objects(&self) -> Vec<Box<dyn Hittable>> {
-        return self.objects;
     }
 
     pub fn add(&mut self, object: Box<dyn Hittable>) {
@@ -79,7 +75,7 @@ impl Hittable for HittableList {
         let mut hit_anything = false;
         let mut closest_so_far = t_max;
 
-        for object in self.objects {
+        for object in &self.objects {
             let (hit, rec) = object.hit(r, t_min, closest_so_far);
             if hit {
                 hit_anything = true;
@@ -96,22 +92,21 @@ impl Hittable for HittableList {
             return (false, AABB::new(Vec3::new(0.0, 0.0, 0.0), Vec3::new(0.0, 0.0, 0.0)));
         }
 
-        let mut output_box: AABB;
+        let mut output_box = AABB::new(Point3::new(0.0, 0.0, 0.0), Point3::new(0.0, 0.0, 0.0));
 
-        let mut temp_box: AABB;
         let mut first_box = true;
 
-        for object in self.objects {
+        for object in &self.objects {
             let (hit, aabb) = object.bounding_box();
             if !hit {
                 return (hit, aabb);
             }
 
             if first_box {
-                output_box = temp_box
+                output_box = aabb;
             }
             else {
-                output_box = surrounding_box(output_box, temp_box);
+                output_box = surrounding_box(output_box, aabb);
                 first_box = false;
             }
         }
